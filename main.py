@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sockets import sio_app
 import uvicorn
@@ -24,20 +24,36 @@ app.add_middleware(
 )
 
 
-@app.post("/api/create/remote")
-async def create_remote_id(request: Request):
-    # 여기도 마찬가지로 랜덤오브제아이디 _id 받아 아이디 고정방식으로 갈 예정이다.
-    body = await request.json()
+@app.get("/api/empty_remote")
+async def create_remote_id():
 
-    result = remote_collection.insert_one(body)
+    result = remote_collection.insert_one({ "signal": None, "sid": None, "screen_id": None, "width": None, "height": None})
     inserted_id = result.inserted_id
-
-    print(result)
 
     return str(inserted_id)
 
+@app.put("/api/remote/{objid}")
+async def create_remote_id(objid: str, request: Request):
+    body = await request.json()
+    
+    # 객체 ID가 유효한지 확인
+    if not ObjectId.is_valid(objid):
+        raise HTTPException(status_code=400, detail="Invalid ID format")
 
-@app.get('/api/get/remote/{objid}')
+    # 업데이트할 데이터 준비
+    update_data = { "$set": body }
+
+    # 데이터베이스에서 업데이트
+    result = remote_collection.update_one({ "_id": ObjectId(objid) }, update_data)
+
+    # 업데이트 결과 확인
+    if result.modified_count == 1:
+        return {"message": "update 성공"}
+    else:
+        return {"message": "update 실패", "details": result.raw_result}
+
+
+@app.get('/api/remote/{objid}')
 async def get_remote(objid: str):
     result = remote_collection.find_one({"_id": ObjectId(objid)})
     result["_id"] = str(result.get("_id"))

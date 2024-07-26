@@ -28,3 +28,13 @@ async def disconnect(sid):
 async def signal(sid, data):
     # print(data)
     await sio.emit('signal', data, room=data.get('sid'))
+
+@sio.event
+async def mouse_move(sid, data):
+    print(data)
+    await sio.emit('mouse_move', data, room=data.get('sid'))
+
+@sio.event
+async def mouse_click(sid, data):
+    # print(data)
+    await sio.emit('mouse_click', data, room=data.get('sid'))
