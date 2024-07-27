@@ -6,9 +6,8 @@
       }
     ],
     "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "main.py"
-      }
+      { "src": "/ws", "dest": "main.py" },
+      { "src": "/ws/(.*)", "dest": "main.py" },
+      { "src": "/(.*)", "dest": "main.py" }
     ]
   }
