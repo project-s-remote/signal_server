@@ -4,8 +4,7 @@ from mongodb import client
 
 sio = socketio.AsyncServer(
     async_mode='asgi',
-    cors_allowed_origins=['*'],  # 모든 origin 허용
-    engineio_logger=True  # 디버깅을 위해 로깅 활성화
+    cors_allowed_origins=[],
 )
 
 sio_app = socketio.ASGIApp(

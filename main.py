@@ -11,13 +11,11 @@ BaseModel.model_config["json_encoders"] = {ObjectId: lambda v: str(v)}
 
 app = FastAPI()
 
-# Mount the Socket.IO server as an ASGI app
-app.mount("/ws", sio_app)
 
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:5173", "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
@@ -55,6 +53,10 @@ async def create_remote_id(objid: str, request: Request):
         return {"message": "update 성공"}
     else:
         return {"message": "update 실패", "details": result.raw_result}
+
+
+# Mount the Socket.IO server as an ASGI app
+app.mount("/ws", sio_app)
 
 
 @app.get('/api/remote/{objid}')
